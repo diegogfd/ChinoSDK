@@ -17,13 +17,15 @@ class MPPMagReader: NSObject {
         case processData
     }
     
-    private var noiseLevel = 0
+    private var noiseLevel : Int64 = 0
     private var samplesToWait = Int(44100 * 0.25)
     
     var actionPerformed = ActionPerformed.nothing
     let jackReader = MPPJackReader()
     
-    var dataToProcess : [Int] = []
+    var dataToProcess : [Int64] = []
+    var samplesUsedForCalibrate = 0
+    var maxValue : Int64 = 0
     
     override init() {
         super.init()
@@ -35,11 +37,95 @@ class MPPMagReader: NSObject {
         jackReader.startRecording()
     }
     
-    func performMicroCalibration(buffer : [Int]){
+    func readData(buffer : [Int64]){
+        while actionPerformed == .readData{
+            let bufferSize = buffer.count
+            if bufferSize > 0 && isABufferWithSignal(buffer) {
+                for k in 0..<bufferSize {
+                    let val = buffer[k]
+                    dataToProcess.append(val)
+                    if abs(val) > maxValue {
+                        maxValue = abs(val)
+                    }
+                }
+            }else{
+                actionPerformed = .processData
+            }
+        }
+    }
+    
+    func processData(){
+        var parseResult : MPPMagReaderParseResult?
+        parseResult = MPPMagReaderParser.parse(dataToProcess,reversed: false,maxValue: maxValue)
+        if parseResult != nil{
+            if parseResult!.code != MPPMagStripeResult.success && parseResult!.code != MPPMagStripeResult.successLuhn {
+                //por si te pasan la tarjeta al reves
+                dataToProcess = dataToProcess.reverse()
+                parseResult = MPPMagReaderParser.parse(dataToProcess,reversed: true,maxValue: maxValue)
+            }
+        }
+        dataToProcess = []
+        maxValue = 0
+    }
+    
+    func isABufferWithSignal(buffer : [Int64]) -> Bool{
+        var minimumSamples = 300
+        for i in 0..<buffer.count {
+            if buffer[i] > noiseLevel {
+                minimumSamples -= 1
+            }
+        }
+        return minimumSamples < 0
+    }
+    
+}
+
+//MARK: - MPPJackReader delegate
+
+extension MPPMagReader : MPPJackReaderDelegate{
+    
+    func jackReaderDelegateDidReadData(integerArrayData: [NSNumber]!) {
+        var buffer : [Int64] = []
+        for data in integerArrayData {
+            buffer.append(data.longLongValue)
+        }
+        switch actionPerformed {
+        case .calibration:
+            samplesUsedForCalibrate += 1
+            if samplesUsedForCalibrate < 4{
+                calibrate(buffer, iteration: samplesUsedForCalibrate)
+            }else{
+                actionPerformed = .readData
+            }
+        case .readData:
+            readData(buffer)
+        case .processData:
+            processData()
+        default:
+            print("")
+        }
+    }
+}
+
+//MARK: - Calibration
+
+extension MPPMagReader{
+    
+    func calibrate(buffer : [Int64],iteration : Int){
+        performMicroCalibration(buffer);
+        if iteration == 1 {
+            noiseLevel = 0;
+        }
+        if iteration == 3 {
+            noiseLevel *= 3;
+        }
+    }
+    
+    func performMicroCalibration(buffer : [Int64]){
         let bufferSize = buffer.count
         let divs = 10
         let chunks = bufferSize / divs
-        var maxs = [Int](count: divs, repeatedValue: 0)
+        var maxs = [Int64](count: divs, repeatedValue: 0)
         if bufferSize > 0 {
             var from = 0
             for i in 0..<divs {
@@ -53,70 +139,16 @@ class MPPMagReader: NSObject {
                 }
             }
         }
-        var prom = 0
+        var prom : Int64 = 0
         for h in 0..<divs{
             prom += maxs[h]
         }
-        prom = prom / divs
+        prom = prom / Int64(divs)
         if noiseLevel == 0{
             noiseLevel = prom
         }else{
             noiseLevel = (prom + noiseLevel) / 2
         }
+        print("NOISE: \(noiseLevel)")
     }
-    
-    func readData(buffer : [Int]){
-        while actionPerformed == .readData{
-            let bufferSize = buffer.count
-            if bufferSize > 0 {
-                var silentSamples = 0
-                for k in 0..<bufferSize {
-                    let val = buffer[k]
-                    dataToProcess.append(val)
-                    if val >= noiseLevel || val <= -noiseLevel {
-                        silentSamples = 0
-                    }else{
-                        silentSamples += 1
-                    }
-                }
-                if silentSamples >= samplesToWait {
-                    actionPerformed = .processData
-                }
-            }
-        }
-    }
-    
-    func processData(){
-        var parseResult : MPPMagReaderParseResult?
-        parseResult = MPPMagReaderParser.parse(dataToProcess)
-        if parseResult != nil{
-            if parseResult!.errorCode != MPPMagStripeResult.success.rawValue && parseResult!.errorCode != MPPMagStripeResult.successLuhn.rawValue {
-                dataToProcess = dataToProcess.reverse()
-                parseResult = MPPMagReaderParser.parse(dataToProcess)
-            }
-        }
-        dataToProcess = []
-    }
-    
-}
-
-extension MPPMagReader : MPPJackReaderDelegate{
-    
-    func jackReaderDelegateDidReadData(integerArrayData: [NSNumber]!) {
-        var buffer : [Int] = []
-        for data in integerArrayData {
-            buffer.append(data.integerValue)
-        }
-        switch actionPerformed {
-        case .calibration:
-            performMicroCalibration(buffer)
-        case .readData:
-            readData(buffer)
-        case .processData:
-            processData()
-        default:
-            print("")
-        }
-    }
-    
 }

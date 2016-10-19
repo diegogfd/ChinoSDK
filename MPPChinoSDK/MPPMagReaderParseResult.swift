@@ -10,11 +10,11 @@ import UIKit
 
 class MPPMagReaderParseResult: NSObject {
 
-    var errorCode = 0
-    var data = ""
+    var code : MPPMagStripeResult = .nothing
+    var data : String?
     
-    init(errorCode : Int, data : String) {
-        self.errorCode = errorCode
+    init(code : MPPMagStripeResult, data : String?) {
+        self.code = code
         self.data = data
     }
     

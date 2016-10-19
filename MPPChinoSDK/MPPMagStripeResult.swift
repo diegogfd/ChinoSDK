@@ -9,6 +9,7 @@
 import UIKit
 
 enum MPPMagStripeResult : Int{
+    case nothing
     case success
     case successLuhn
     case shittyData
