@@ -22,4 +22,37 @@ enum MPPMagStripeResult : Int{
     case ignoreMicOut
     case tooFast
     case tooSlow
+    
+    func description() -> String{
+        var descr = ""
+        switch self {
+        case .nothing:
+            descr = "nothing"
+        case .success:
+            descr = "success"
+        case .successLuhn:
+            descr = "successLuhn"
+        case .shittyData:
+            descr = "shittyData"
+        case .startSentinelNotFound:
+            descr = "startSentinelNotFound"
+        case .parityBitCheckFailed:
+            descr = "parityBitCheckFailed"
+        case .parityForLRCCheckFailed:
+            descr = "parityForLRCCheckFailed"
+        case .LRCCheckFailed:
+            descr = "LRCCheckFailed"
+        case .unableToPerformLRCCheck:
+            descr = "unableToPerformLRCCheck"
+        case .unknownError:
+            descr = "unknownError"
+        case .ignoreMicOut:
+            descr = "ignoreMicOut"
+        case .tooFast:
+            descr = "tooFast"
+        case .tooSlow:
+            descr = "tooSlow"
+        }
+        return descr
+    }
 }

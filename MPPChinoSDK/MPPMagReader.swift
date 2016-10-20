@@ -22,8 +22,10 @@ class MPPMagReader: NSObject {
     
     var actionPerformed = ActionPerformed.nothing
     let jackReader = MPPJackReader()
+    let operationQueue = NSOperationQueue()
     
     var dataToProcess : [Int64] = []
+    var dataRead : [Int64] = []
     var samplesUsedForCalibrate = 0
     var maxValue : Int64 = 0
     
@@ -38,19 +40,22 @@ class MPPMagReader: NSObject {
     }
     
     func readData(buffer : [Int64]){
-        while actionPerformed == .readData{
-            let bufferSize = buffer.count
-            if bufferSize > 0 && isABufferWithSignal(buffer) {
-                for k in 0..<bufferSize {
-                    let val = buffer[k]
-                    dataToProcess.append(val)
-                    if abs(val) > maxValue {
-                        maxValue = abs(val)
-                    }
+        dataRead.appendContentsOf(buffer)
+        let bufferSize = dataRead.count
+        if bufferSize > 0 && isABufferWithSignal(dataRead) {
+            for k in 0..<bufferSize {
+                let val = dataRead[k]
+                dataToProcess.append(val)
+                if abs(val) > maxValue {
+                    maxValue = abs(val)
                 }
-            }else{
-                actionPerformed = .processData
             }
+        }
+        if !dataToProcess.isEmpty{
+            actionPerformed = .processData
+        }
+        if dataRead.count > 10000 {
+            dataRead = []
         }
     }
     
@@ -64,8 +69,11 @@ class MPPMagReader: NSObject {
                 parseResult = MPPMagReaderParser.parse(dataToProcess,reversed: true,maxValue: maxValue)
             }
         }
+        print("PARSE RESULT: \(parseResult!.code.description())")
         dataToProcess = []
+        dataRead = []
         maxValue = 0
+        actionPerformed = .readData
     }
     
     func isABufferWithSignal(buffer : [Int64]) -> Bool{
@@ -92,7 +100,7 @@ extension MPPMagReader : MPPJackReaderDelegate{
         switch actionPerformed {
         case .calibration:
             samplesUsedForCalibrate += 1
-            if samplesUsedForCalibrate < 4{
+            if samplesUsedForCalibrate < 300{
                 calibrate(buffer, iteration: samplesUsedForCalibrate)
             }else{
                 actionPerformed = .readData
@@ -116,7 +124,7 @@ extension MPPMagReader{
         if iteration == 1 {
             noiseLevel = 0;
         }
-        if iteration == 3 {
+        if iteration == 299 {
             noiseLevel *= 3;
         }
     }

@@ -12,6 +12,7 @@
 		E12E4FF71DB6A4560033F23D /* MPPMagReaderParseResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = E12E4FF61DB6A4560033F23D /* MPPMagReaderParseResult.swift */; };
 		E12E4FF91DB6CCB30033F23D /* MPPMagReaderParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E12E4FF81DB6CCB30033F23D /* MPPMagReaderParser.swift */; };
 		E18EE2E91DB7C04700CA0C7E /* MPPParserOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18EE2E81DB7C04700CA0C7E /* MPPParserOperation.swift */; };
+		E18EE2EB1DB7EDF300CA0C7E /* MPPPeak.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18EE2EA1DB7EDF300CA0C7E /* MPPPeak.swift */; };
 		E1BD069E1DB55A7100E670E8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E1BD069D1DB55A7100E670E8 /* main.m */; };
 		E1BD06A11DB55A7100E670E8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E1BD06A01DB55A7100E670E8 /* AppDelegate.m */; };
 		E1BD06A41DB55A7100E670E8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1BD06A31DB55A7100E670E8 /* ViewController.m */; };
@@ -48,6 +49,7 @@
 		E12E4FF61DB6A4560033F23D /* MPPMagReaderParseResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPPMagReaderParseResult.swift; sourceTree = "<group>"; };
 		E12E4FF81DB6CCB30033F23D /* MPPMagReaderParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPPMagReaderParser.swift; sourceTree = "<group>"; };
 		E18EE2E81DB7C04700CA0C7E /* MPPParserOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPPParserOperation.swift; sourceTree = "<group>"; };
+		E18EE2EA1DB7EDF300CA0C7E /* MPPPeak.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MPPPeak.swift; sourceTree = "<group>"; };
 		E1BD06991DB55A7100E670E8 /* MPPChinoSDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MPPChinoSDK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1BD069D1DB55A7100E670E8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E1BD069F1DB55A7100E670E8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				E12E4FF61DB6A4560033F23D /* MPPMagReaderParseResult.swift */,
 				E12E4FF81DB6CCB30033F23D /* MPPMagReaderParser.swift */,
 				E18EE2E81DB7C04700CA0C7E /* MPPParserOperation.swift */,
+				E18EE2EA1DB7EDF300CA0C7E /* MPPPeak.swift */,
 			);
 			path = MPPChinoSDK;
 			sourceTree = "<group>";
@@ -304,6 +307,7 @@
 				E12E4FF71DB6A4560033F23D /* MPPMagReaderParseResult.swift in Sources */,
 				E12E4FF91DB6CCB30033F23D /* MPPMagReaderParser.swift in Sources */,
 				E1BD06D31DB5679700E670E8 /* MPPJackReader.m in Sources */,
+				E18EE2EB1DB7EDF300CA0C7E /* MPPPeak.swift in Sources */,
 				E1BD069E1DB55A7100E670E8 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
